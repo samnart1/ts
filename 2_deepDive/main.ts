@@ -209,3 +209,51 @@ function printValue<T>(value: T): void {
 }
 printValue<number>(123)
 printValue<string>('HelloWorld!')
+
+class GenericsInMemoryResource<
+  T extends { id: number }
+> extends AbstractDatabaseResource {
+  private resources: T[] = []
+  constructor(resourceName: string) {
+    super(resourceName)
+  }
+  get(id: number): T | null {
+    const resource = this.resources.find((item) => item.id == id)
+    return resource ? { ...resource } : null
+  }
+  getAll(): T[] {
+    return [...this.resources]
+  }
+  addResource(resource: T): void {
+    this.resources.push(resource)
+    this.logResource(resource)
+  }
+}
+
+const userInMemoryResource = new GenericsInMemoryResource<IUser>('user')
+const chatInMemoryResource = new GenericsInMemoryResource<IChat>('chat')
+userInMemoryResource.addResource({
+  id: 1,
+  name: 'Admin',
+  email: 'admin@admin.com',
+})
+chatInMemoryResource.addResource({
+  id: 10,
+  ownerId: userInMemoryResource.get(1)!.id,
+  messages: [],
+})
+
+
+// PROMISES
+// you can use generics to indicate the type of data the promise will eventually return 
+function fetchData(): Promise<string> {
+    return new Promise((resolve) => {
+        setTimeout(() => resolve("Data Fetched"), 1000)
+    })
+}
+
+function fetchData2() {
+    return new Promise(() => {
+        
+    })
+}
